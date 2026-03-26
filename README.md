@@ -637,7 +637,7 @@ uv run workspace-cli call search_gmail_messages \
 </tr>
 </table>
 
-The default server URL is `https://mcp.workspacemcp.com/mcp`. Override it with `--url` or the `WORKSPACE_MCP_URL` environment variable.
+Set URL for remote endpoints with `--url` or the `WORKSPACE_MCP_URL` environment variable.
 
 </details>
 
@@ -654,7 +654,7 @@ The [FastMCP CLI](https://gofastmcp.com/cli) also ships with the server and can 
 
 **▶ List Tools**
 ```bash
-fastmcp list https://mcp.workspacemcp.com/mcp
+fastmcp list https://test.workspacemcp.com/mcp
 fastmcp list fastmcp_server.py      # local introspection
 ```
 <sub>View all available tools</sub>
@@ -664,7 +664,7 @@ fastmcp list fastmcp_server.py      # local introspection
 
 **◆ Call a Tool**
 ```bash
-fastmcp call https://mcp.workspacemcp.com/mcp \
+fastmcp call https://test.workspacemcp.com/mcp \
   search_gmail_messages query="is:unread"
 ```
 <sub>Execute a tool with key=value arguments</sub>
@@ -702,22 +702,22 @@ fastmcp install cursor fastmcp_server.py
 OAuth is handled automatically when targeting an HTTP URL. On first use, a browser window opens for Google consent. Use `--auth none` for local development servers that don't require auth.
 
 ```bash
-fastmcp list https://mcp.workspacemcp.com/mcp               # OAuth (default)
-fastmcp list https://mcp.workspacemcp.com/mcp --auth none    # skip auth
-fastmcp list https://mcp.workspacemcp.com/mcp --auth "Bearer sk-..."  # bearer token
+fastmcp list https://test.workspacemcp.com/mcp               # OAuth (default)
+fastmcp list https://test.workspacemcp.com/mcp --auth none    # skip auth
+fastmcp list https://test.workspacemcp.com/mcp --auth "Bearer sk-..."  # bearer token
 ```
 
 **Examples:**
 ```bash
 # List tools with full input schemas
-fastmcp list https://mcp.workspacemcp.com/mcp --input-schema
+fastmcp list https://test.workspacemcp.com/mcp --input-schema
 
 # Call a tool with complex arguments
-fastmcp call https://mcp.workspacemcp.com/mcp search_gmail_messages \
+fastmcp call https://test.workspacemcp.com/mcp search_gmail_messages \
   query="is:unread" max_results=5
 
 # JSON output for scripting
-fastmcp list https://mcp.workspacemcp.com/mcp --json | jq '.tools[] | .name'
+fastmcp list https://test.workspacemcp.com/mcp --json | jq '.tools[] | .name'
 
 # Discover servers already configured in your editors
 fastmcp discover

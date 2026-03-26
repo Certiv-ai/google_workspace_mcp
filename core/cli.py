@@ -27,7 +27,7 @@ from key_value.aio.wrappers.encryption import FernetEncryptionWrapper
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_URL = "https://mcp.workspacemcp.com/mcp"
+DEFAULT_URL = "http://localhost:8000/mcp"
 CLI_HOME = os.path.expanduser("~/.workspace-mcp")
 TOKEN_DIR = os.path.join(CLI_HOME, "cli-tokens")
 KEY_PATH = os.path.join(CLI_HOME, ".cli-encryption-key")
