@@ -2620,8 +2620,8 @@ async def batch_modify_gmail_message_labels(
 async def forward_gmail_message(
     service,
     user_google_email: str,
-    message_id: str = Body(..., description="The ID of the message to forward"),
-    to: str = Body(..., description="Recipient email address"),
+    message_id: str,
+    to: str,
 ) -> str:
     """
     Forward a Gmail message with all attachments preserved.
