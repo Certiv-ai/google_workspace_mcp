@@ -464,12 +464,16 @@ async def get_events(
         attendee_details_str = _format_attendee_details(attendees, indent="  ")
 
         meeting_link = _get_meeting_link(item)
+        created = item.get("created", "Unknown")
+        updated = item.get("updated", "Unknown")
 
         event_details = (
             f"Event Details:\n"
             f"- Title: {summary}\n"
             f"- Starts: {start}\n"
             f"- Ends: {end}\n"
+            f"- Created: {created}\n"
+            f"- Updated: {updated}\n"
             f"- Description: {description}\n"
             f"- Location: {location}\n"
             f"- Color ID: {color_id}\n"
@@ -516,9 +520,13 @@ async def get_events(
             attendee_details_str = _format_attendee_details(attendees, indent="    ")
 
             meeting_link = _get_meeting_link(item)
+            created = item.get("created", "Unknown")
+            updated = item.get("updated", "Unknown")
 
             event_detail_parts = (
                 f'- "{summary}" (Starts: {start_time}, Ends: {end_time})\n'
+                f"  Created: {created}\n"
+                f"  Updated: {updated}\n"
                 f"  Description: {description}\n"
                 f"  Location: {location}\n"
             )
