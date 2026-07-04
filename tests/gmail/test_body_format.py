@@ -42,23 +42,36 @@ def _headers(**overrides):
     return [{"name": name, "value": value} for name, value in header_map.items()]
 
 
-def _payload(headers=None, text=None, html=None):
+def _payload(headers=None, text=None, html=None, attachments=None):
     payload = {"headers": headers or _headers()}
     parts = []
     if text is not None:
         parts.append({"mimeType": "text/plain", "body": {"data": _encode(text)}})
     if html is not None:
         parts.append({"mimeType": "text/html", "body": {"data": _encode(html)}})
+    for att in attachments or []:
+        parts.append(
+            {
+                "filename": att["filename"],
+                "mimeType": att.get("mimeType", "application/octet-stream"),
+                "body": {
+                    "attachmentId": att["attachmentId"],
+                    "size": att.get("size", 0),
+                },
+            }
+        )
     if parts:
-        payload["mimeType"] = "multipart/alternative"
+        payload["mimeType"] = "multipart/mixed"
         payload["parts"] = parts
     return payload
 
 
-def _message_response(message_id: str, text="", html="", headers=None):
+def _message_response(message_id: str, text="", html="", headers=None, attachments=None):
     return {
         "id": message_id,
-        "payload": _payload(headers=headers, text=text, html=html),
+        "payload": _payload(
+            headers=headers, text=text, html=html, attachments=attachments
+        ),
     }
 
 
@@ -385,6 +398,39 @@ async def test_get_gmail_messages_content_batch_default_text_format():
     assert "Plain text body" in result
     assert "--- BODY ---" in result
     assert "--- RAW MIME ---" not in result
+
+
+@pytest.mark.asyncio
+async def test_get_gmail_messages_content_batch_surfaces_attachment_ids():
+    """Batch reads must list attachment IDs so they can be downloaded, matching
+    get_gmail_message_content (regression: batch previously omitted attachments)."""
+    service = _build_service(
+        message_responses={
+            ("msg-1", "full"): _message_response(
+                "msg-1",
+                text="See attached",
+                attachments=[
+                    {
+                        "filename": "Final Invoice 304882.pdf",
+                        "mimeType": "application/pdf",
+                        "attachmentId": "ATTACH-XYZ",
+                        "size": 116416,
+                    }
+                ],
+            ),
+        }
+    )
+
+    result = await _unwrap(get_gmail_messages_content_batch)(
+        service=service,
+        message_ids=["msg-1"],
+        user_google_email="user@example.com",
+    )
+
+    assert "--- ATTACHMENTS ---" in result
+    assert "Final Invoice 304882.pdf" in result
+    assert "Attachment ID: ATTACH-XYZ" in result
+    assert "get_gmail_attachment_content(message_id='msg-1'" in result
 
 
 @pytest.mark.asyncio

@@ -598,6 +598,33 @@ def _extract_attachments(payload: dict) -> List[Dict[str, Any]]:
     return attachments
 
 
+def _format_attachment_lines(
+    attachments: List[Dict[str, Any]], message_id: str
+) -> List[str]:
+    """
+    Build the human-readable "--- ATTACHMENTS ---" block for a message.
+
+    Surfaces each attachment's filename, MIME type, size, and (crucially) its
+    attachmentId plus the exact get_gmail_attachment_content() call needed to
+    download it. Shared by get_gmail_message_content and
+    get_gmail_messages_content_batch so both list attachment IDs consistently.
+
+    Returns an empty list when there are no attachments.
+    """
+    if not attachments:
+        return []
+
+    lines = ["\n--- ATTACHMENTS ---"]
+    for i, att in enumerate(attachments, 1):
+        size_kb = att["size"] / 1024
+        lines.append(
+            f"{i}. {att['filename']} ({att['mimeType']}, {size_kb:.1f} KB)\n"
+            f"   Attachment ID: {att['attachmentId']}\n"
+            f"   Use get_gmail_attachment_content(message_id='{message_id}', attachment_id='{att['attachmentId']}') to download"
+        )
+    return lines
+
+
 def _extract_headers(payload: dict, header_names: List[str]) -> Dict[str, str]:
     """
     Extract specified headers from a Gmail message payload.
@@ -1116,15 +1143,7 @@ async def get_gmail_message_content(
     content_lines.append(f"\n--- BODY ---\n{body_data or '[No text/plain body found]'}")
 
     # Add attachment information if present
-    if attachments:
-        content_lines.append("\n--- ATTACHMENTS ---")
-        for i, att in enumerate(attachments, 1):
-            size_kb = att["size"] / 1024
-            content_lines.append(
-                f"{i}. {att['filename']} ({att['mimeType']}, {size_kb:.1f} KB)\n"
-                f"   Attachment ID: {att['attachmentId']}\n"
-                f"   Use get_gmail_attachment_content(message_id='{message_id}', attachment_id='{att['attachmentId']}') to download"
-            )
+    content_lines.extend(_format_attachment_lines(attachments, message_id))
 
     return "\n".join(content_lines)
 
@@ -1287,6 +1306,16 @@ async def get_gmail_messages_content_batch(
                     )
                     msg_output += f"\nWeb Link: {_generate_gmail_web_url(mid)}\n"
                     msg_output += f"\n--- {body_label} ---\n{body_data}\n"
+
+                    # Surface attachment IDs so they can be downloaded via
+                    # get_gmail_attachment_content. Only the "full" payload (text/html
+                    # modes) carries part/attachmentId data; raw mode fetches metadata
+                    # only, so _extract_attachments yields nothing there.
+                    attachment_lines = _format_attachment_lines(
+                        _extract_attachments(payload), mid
+                    )
+                    if attachment_lines:
+                        msg_output += "\n".join(attachment_lines) + "\n"
 
                     output_messages.append(msg_output)
 
