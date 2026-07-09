@@ -1945,6 +1945,95 @@ async def draft_gmail_message(
     return f"Draft created{attachment_info}! Draft ID: {draft_id}"
 
 
+@server.tool()
+@handle_http_errors("send_gmail_draft", service_type="gmail")
+@require_google_service("gmail", GMAIL_SEND_SCOPE)
+async def send_gmail_draft(
+    service,
+    user_google_email: str,
+    draft_id: Annotated[
+        str,
+        Field(
+            description="The ID of the existing Gmail draft to send. Returned by draft_gmail_message as 'Draft ID'.",
+        ),
+    ],
+) -> str:
+    """
+    Sends an existing Gmail draft, promoting it to a sent message and removing it from the Drafts folder.
+
+    This is the correct way to send a draft after creating one with draft_gmail_message and reviewing
+    it. Calling send_gmail_message with the same content would compose a brand-new message and leave
+    the original draft orphaned in the Drafts folder. send_gmail_draft uses the Gmail API's
+    users.drafts.send endpoint, which atomically converts the draft into the sent message.
+
+    Args:
+        user_google_email (str): The user's Google email address. Required for authentication.
+        draft_id (str): The ID of the draft to send (returned by draft_gmail_message).
+
+    Returns:
+        str: Confirmation with the resulting sent Message ID and Thread ID.
+
+    Examples:
+        # Send a draft you previously created and reviewed
+        send_gmail_draft(user_google_email="me@example.com", draft_id="r-1234567890")
+    """
+    logger.info(
+        f"[send_gmail_draft] Invoked. Email: '{user_google_email}', Draft ID: '{draft_id}'"
+    )
+
+    sent = await asyncio.to_thread(
+        service.users().drafts().send(userId="me", body={"id": draft_id}).execute
+    )
+    message_id = sent.get("id")
+    thread_id = sent.get("threadId")
+    return (
+        f"Draft sent! Message ID: {message_id}, Thread ID: {thread_id}. "
+        f"The draft has been removed from Drafts."
+    )
+
+
+@server.tool()
+@handle_http_errors("delete_gmail_draft", service_type="gmail")
+@require_google_service("gmail", GMAIL_COMPOSE_SCOPE)
+async def delete_gmail_draft(
+    service,
+    user_google_email: str,
+    draft_id: Annotated[
+        str,
+        Field(
+            description="The ID of the Gmail draft to permanently delete. Returned by draft_gmail_message as 'Draft ID'.",
+        ),
+    ],
+) -> str:
+    """
+    Permanently deletes a Gmail draft.
+
+    Useful for cleaning up drafts that are no longer needed (for example, after sending an
+    equivalent message via send_gmail_message, or after abandoning a draft mid-flow). Note: this
+    is an immediate, permanent deletion (Gmail's drafts.delete endpoint); it does not move the
+    draft to Trash.
+
+    Args:
+        user_google_email (str): The user's Google email address. Required for authentication.
+        draft_id (str): The ID of the draft to delete (returned by draft_gmail_message).
+
+    Returns:
+        str: Confirmation that the draft was deleted.
+
+    Examples:
+        # Clean up a draft you no longer need
+        delete_gmail_draft(user_google_email="me@example.com", draft_id="r-1234567890")
+    """
+    logger.info(
+        f"[delete_gmail_draft] Invoked. Email: '{user_google_email}', Draft ID: '{draft_id}'"
+    )
+
+    await asyncio.to_thread(
+        service.users().drafts().delete(userId="me", id=draft_id).execute
+    )
+    return f"Draft deleted. Draft ID: {draft_id}"
+
+
 def _format_thread_content(
     thread_data: dict,
     thread_id: str,
