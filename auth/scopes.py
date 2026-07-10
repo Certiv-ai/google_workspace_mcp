@@ -80,6 +80,10 @@ SCRIPT_DEPLOYMENTS_READONLY_SCOPE = (
 )
 SCRIPT_PROCESSES_READONLY_SCOPE = "https://www.googleapis.com/auth/script.processes"
 SCRIPT_METRICS_SCOPE = "https://www.googleapis.com/auth/script.metrics"
+SCRIPT_EXTERNAL_REQUEST_SCOPE = (
+    "https://www.googleapis.com/auth/script.external_request"
+)
+SCRIPT_SCRIPTAPP_SCOPE = "https://www.googleapis.com/auth/script.scriptapp"
 
 # Google Analytics (GA4) scopes
 ANALYTICS_READONLY_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
@@ -138,6 +142,9 @@ def has_required_scopes(available_scopes, required_scopes):
 # Base OAuth scopes required for user identification
 BASE_SCOPES = [USERINFO_EMAIL_SCOPE, USERINFO_PROFILE_SCOPE, OPENID_SCOPE]
 
+# Minimal scopes required to accept an MCP bearer token at the protocol layer.
+PROTOCOL_AUTH_SCOPES = [USERINFO_EMAIL_SCOPE, OPENID_SCOPE]
+
 # Service-specific scope groups
 DOCS_SCOPES = [
     DOCS_READONLY_SCOPE,
@@ -189,6 +196,8 @@ SCRIPT_SCOPES = [
     SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
     SCRIPT_PROCESSES_READONLY_SCOPE,  # Required for list_script_processes
     SCRIPT_METRICS_SCOPE,  # Required for get_script_metrics
+    SCRIPT_EXTERNAL_REQUEST_SCOPE,  # Required for scripts.run (execution API)
+    SCRIPT_SCRIPTAPP_SCOPE,  # Required for scripts.run (execution API)
     DRIVE_FILE_SCOPE,  # Required for list/delete script projects (uses Drive API)
 ]
 
@@ -246,7 +255,7 @@ def set_enabled_tools(enabled_tools):
     """
     global _ENABLED_TOOLS
     _ENABLED_TOOLS = enabled_tools
-    logger.info(f"Enabled tools set for scope management: {enabled_tools}")
+    logger.info(f"Scope management active for {len(enabled_tools)} services")
 
 
 # Global variable to store read-only mode (set by main.py)
