@@ -81,6 +81,10 @@ SCRIPT_DEPLOYMENTS_READONLY_SCOPE = (
 SCRIPT_PROCESSES_READONLY_SCOPE = "https://www.googleapis.com/auth/script.processes"
 SCRIPT_METRICS_SCOPE = "https://www.googleapis.com/auth/script.metrics"
 
+# Google Analytics (GA4) scopes
+ANALYTICS_READONLY_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
+ANALYTICS_EDIT_SCOPE = "https://www.googleapis.com/auth/analytics.edit"
+
 # Google scope hierarchy: broader scopes that implicitly cover narrower ones.
 # See https://developers.google.com/gmail/api/auth/scopes,
 # https://developers.google.com/drive/api/guides/api-specific-auth, etc.
@@ -103,6 +107,9 @@ SCOPE_HIERARCHY = {
     FORMS_BODY_SCOPE: {FORMS_BODY_READONLY_SCOPE},
     SCRIPT_PROJECTS_SCOPE: {SCRIPT_PROJECTS_READONLY_SCOPE},
     SCRIPT_DEPLOYMENTS_SCOPE: {SCRIPT_DEPLOYMENTS_READONLY_SCOPE},
+    # Note: analytics.edit is intentionally NOT mapped as covering analytics.readonly.
+    # The GA4 Data API (analyticsdata) requires analytics.readonly specifically, so the
+    # "analytics" tool always requests both scopes rather than relying on a hierarchy.
 }
 
 
@@ -185,6 +192,10 @@ SCRIPT_SCOPES = [
     DRIVE_FILE_SCOPE,  # Required for list/delete script projects (uses Drive API)
 ]
 
+# Google Analytics (GA4) scopes. Both are requested together: analytics.edit covers the
+# Admin API writes, analytics.readonly is required by the Data API for reporting.
+ANALYTICS_SCOPES = [ANALYTICS_READONLY_SCOPE, ANALYTICS_EDIT_SCOPE]
+
 # Tool-to-scopes mapping
 TOOL_SCOPES_MAP = {
     "gmail": GMAIL_SCOPES,
@@ -199,6 +210,7 @@ TOOL_SCOPES_MAP = {
     "contacts": CONTACTS_SCOPES,
     "search": CUSTOM_SEARCH_SCOPES,
     "appscript": SCRIPT_SCOPES,
+    "analytics": ANALYTICS_SCOPES,
 }
 
 # Tool-to-read-only-scopes mapping
@@ -221,6 +233,7 @@ TOOL_READONLY_SCOPES_MAP = {
         SCRIPT_METRICS_SCOPE,
         DRIVE_READONLY_SCOPE,
     ],
+    "analytics": [ANALYTICS_READONLY_SCOPE],
 }
 
 

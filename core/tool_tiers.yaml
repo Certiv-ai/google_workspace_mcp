@@ -151,6 +151,39 @@ search:
   complete:
     - get_search_engine_info
 
+analytics:
+  core:
+    - list_account_summaries
+    - list_properties
+    - get_property
+    - run_report
+    - run_realtime_report
+  extended:
+    - list_custom_dimensions
+    - create_custom_dimension
+    - update_custom_dimension
+    - archive_custom_dimension
+    - list_custom_metrics
+    - create_custom_metric
+    - update_custom_metric
+    - archive_custom_metric
+    - list_key_events
+    - create_key_event
+    - delete_key_event
+    - list_data_streams
+    - get_data_stream
+  complete:
+    - list_measurement_protocol_secrets
+    - create_measurement_protocol_secret
+    - list_event_create_rules
+    - create_event_create_rule
+    - update_event_create_rule
+    - delete_event_create_rule
+    - list_event_edit_rules
+    - create_event_edit_rule
+    - update_event_edit_rule
+    - delete_event_edit_rule
+
 appscript:
   core:
     - list_script_projects
