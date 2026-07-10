@@ -31,7 +31,9 @@ from ganalytics.analytics_helpers import (  # noqa: E402
 
 
 def _http_error(status: int, content: bytes = b"{}") -> HttpError:
-    return HttpError(Response({"status": status, "reason": "x"}), content, uri="https://x")
+    return HttpError(
+        Response({"status": status, "reason": "x"}), content, uri="https://x"
+    )
 
 
 class TestNormalization:
@@ -54,8 +56,7 @@ class TestNormalization:
 
     def test_data_stream_from_bare_id(self):
         assert (
-            normalize_data_stream_name("123", "456")
-            == "properties/123/dataStreams/456"
+            normalize_data_stream_name("123", "456") == "properties/123/dataStreams/456"
         )
 
     def test_data_stream_from_full_name(self):
@@ -134,7 +135,10 @@ class TestFormatReportResponse:
         assert result["rowCount"] == 0
 
     def test_preserves_totals_and_metadata(self):
-        response = {"totals": [{"metricValues": [{"value": "9"}]}], "metadata": {"x": 1}}
+        response = {
+            "totals": [{"metricValues": [{"value": "9"}]}],
+            "metadata": {"x": 1},
+        }
         result = format_report_response(response)
         assert result["totals"] == response["totals"]
         assert result["metadata"] == response["metadata"]
