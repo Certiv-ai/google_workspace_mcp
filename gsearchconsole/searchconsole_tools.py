@@ -18,12 +18,12 @@ from mcp import Resource
 
 from auth.service_decorator import require_google_service
 from core.server import server
-from core.utils import UserInputError
 from gsearchconsole.searchconsole_helpers import (
     build_search_analytics_body,
     format_search_analytics_response,
     handle_gsc_errors,
     require_feedpath,
+    require_non_empty,
     require_site_url,
 )
 
@@ -108,8 +108,9 @@ async def query_search_analytics(
         end_date: End date, inclusive, "YYYY-MM-DD". Required.
         dimensions: Group-by dimensions. Valid values: query, page, country, device,
             searchAppearance, date. Omit for a single totals row.
-        row_limit: Max rows to return (1-25000; GSC caps at 25000). Defaults to GSC's
-            own default when omitted.
+        row_limit: Max rows to return (1-25000; values above 25000 are rejected since
+            that is GSC's per-request cap). Defaults to GSC's own default when omitted;
+            page larger result sets with start_row.
         start_row: Zero-based row offset for pagination.
         dimension_filter_groups: Optional GSC dimensionFilterGroups, e.g.
             [{"groupType": "and", "filters": [{"dimension": "country",
@@ -120,8 +121,9 @@ async def query_search_analytics(
         aggregation_type: How to aggregate results: auto, byProperty, or byPage.
 
     Returns:
-        {"rowCount", "rows": [{"keys", "clicks", "impressions", "ctr", "position"}],
-        "responseAggregationType"}.
+        {"rowsReturned", "rows": [{"keys", "clicks", "impressions", "ctr",
+        "position"}], "responseAggregationType"}. "rowsReturned" is the count in this
+        response, not a grand total; if it equals row_limit, page on with start_row.
     """
     logger.info(f"[query_search_analytics] Invoked. Email: '{user_google_email}'")
     body = build_search_analytics_body(
@@ -227,11 +229,8 @@ async def inspect_url(
         index status, coverage, and last-crawl details.
     """
     logger.info(f"[inspect_url] Invoked. Email: '{user_google_email}'")
-    inspection = str(inspection_url or "").strip()
-    if not inspection:
-        raise UserInputError("inspection_url is required")
     body: Dict[str, Any] = {
-        "inspectionUrl": inspection,
+        "inspectionUrl": require_non_empty(inspection_url, "inspection_url"),
         "siteUrl": require_site_url(site_url),
     }
     if language_code:

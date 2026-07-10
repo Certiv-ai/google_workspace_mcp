@@ -23,6 +23,7 @@ from gsearchconsole.searchconsole_helpers import (  # noqa: E402
     format_search_analytics_response,
     normalize_dimensions,
     require_feedpath,
+    require_non_empty,
     require_site_url,
     summarize_gsc_error,
 )
@@ -35,6 +36,13 @@ def _http_error(status: int, content: bytes = b"{}") -> HttpError:
 
 
 class TestValidation:
+    def test_require_non_empty_passthrough_and_strip(self):
+        assert require_non_empty("  x ", "field") == "x"
+
+    def test_require_non_empty_empty_raises(self):
+        with pytest.raises(UserInputError):
+            require_non_empty("", "field")
+
     def test_site_url_passthrough(self):
         assert (
             require_site_url("https://www.example.com/") == "https://www.example.com/"
@@ -104,9 +112,13 @@ class TestBuildBody:
         assert body["dataState"] == "all"
         assert body["aggregationType"] == "byPage"
 
-    def test_row_limit_capped_at_25000(self):
-        body = build_search_analytics_body("2024-01-01", "2024-01-31", row_limit=99999)
+    def test_row_limit_at_cap_allowed(self):
+        body = build_search_analytics_body("2024-01-01", "2024-01-31", row_limit=25000)
         assert body["rowLimit"] == 25000
+
+    def test_row_limit_over_cap_raises(self):
+        with pytest.raises(UserInputError):
+            build_search_analytics_body("2024-01-01", "2024-01-31", row_limit=99999)
 
     def test_row_limit_non_positive_raises(self):
         with pytest.raises(UserInputError):
@@ -120,6 +132,12 @@ class TestBuildBody:
         with pytest.raises(UserInputError):
             build_search_analytics_body(
                 "2024-01-01", "2024-01-31", aggregation_type="nonsense"
+            )
+
+    def test_bad_search_type_raises(self):
+        with pytest.raises(UserInputError):
+            build_search_analytics_body(
+                "2024-01-01", "2024-01-31", search_type="organic"
             )
 
 
@@ -138,7 +156,7 @@ class TestFormatResponse:
             "responseAggregationType": "byProperty",
         }
         result = format_search_analytics_response(response)
-        assert result["rowCount"] == 1
+        assert result["rowsReturned"] == 1
         assert result["responseAggregationType"] == "byProperty"
         row = result["rows"][0]
         assert row["keys"] == ["python", "usa"]
@@ -147,7 +165,7 @@ class TestFormatResponse:
 
     def test_empty_response(self):
         result = format_search_analytics_response({})
-        assert result == {"rowCount": 0, "rows": []}
+        assert result == {"rowsReturned": 0, "rows": []}
 
 
 class TestErrorSummary:

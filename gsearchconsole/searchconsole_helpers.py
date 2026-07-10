@@ -23,6 +23,20 @@ VALID_DIMENSIONS = {"query", "page", "country", "device", "searchAppearance", "d
 # Aggregation types accepted by searchAnalytics.query.
 VALID_AGGREGATION_TYPES = {"auto", "byProperty", "byPage"}
 
+# Search types accepted by searchAnalytics.query (sent as the "type" field).
+VALID_SEARCH_TYPES = {"web", "image", "video", "news", "discover", "googleNews"}
+
+# GSC caps rowLimit at 25000 rows per searchAnalytics.query request.
+MAX_ROW_LIMIT = 25000
+
+
+def require_non_empty(value: str, field: str) -> str:
+    """Return ``value`` stripped, or raise UserInputError if it is empty/None."""
+    cleaned = str(value or "").strip()
+    if not cleaned:
+        raise UserInputError(f"{field} is required")
+    return cleaned
+
 
 def require_site_url(site_url: str) -> str:
     """
@@ -32,18 +46,12 @@ def require_site_url(site_url: str) -> str:
     ("sc-domain:example.com"). The value is passed through unchanged; GSC matches it
     exactly against the properties the authenticated user can access.
     """
-    value = str(site_url or "").strip()
-    if not value:
-        raise UserInputError("site_url is required")
-    return value
+    return require_non_empty(site_url, "site_url")
 
 
 def require_feedpath(feedpath: str) -> str:
     """Validate and return a sitemap URL (the ``feedpath`` GSC parameter)."""
-    value = str(feedpath or "").strip()
-    if not value:
-        raise UserInputError("feedpath (sitemap URL) is required")
-    return value
+    return require_non_empty(feedpath, "feedpath (sitemap URL)")
 
 
 def normalize_dimensions(dimensions: Optional[List[str]]) -> List[str]:
@@ -84,8 +92,9 @@ def build_search_analytics_body(
     Build and validate a searchAnalytics.query request body.
 
     ``start_date`` and ``end_date`` are required ISO dates ("YYYY-MM-DD"). Optional
-    ``search_type`` (a.k.a. ``type``: web/image/video/news/discover/googleNews) and
-    ``aggregation_type`` are validated where GSC constrains them.
+    ``search_type`` (a.k.a. ``type``: web/image/video/news/discover/googleNews),
+    ``aggregation_type``, and ``row_limit`` are validated where GSC constrains them;
+    invalid values raise UserInputError up front rather than reaching GSC.
     """
     start = str(start_date or "").strip()
     end = str(end_date or "").strip()
@@ -101,8 +110,13 @@ def build_search_analytics_body(
     if row_limit is not None:
         if not isinstance(row_limit, int) or row_limit <= 0:
             raise UserInputError("row_limit must be a positive integer")
-        # GSC caps rowLimit at 25000 per request.
-        body["rowLimit"] = min(row_limit, 25000)
+        # Reject over-cap up front rather than silently truncating the result set.
+        if row_limit > MAX_ROW_LIMIT:
+            raise UserInputError(
+                f"row_limit must be <= {MAX_ROW_LIMIT} (GSC's per-request cap); "
+                f"use start_row to page through larger result sets"
+            )
+        body["rowLimit"] = row_limit
 
     if start_row is not None:
         if not isinstance(start_row, int) or start_row < 0:
@@ -113,6 +127,11 @@ def build_search_analytics_body(
         body["dimensionFilterGroups"] = dimension_filter_groups
 
     if search_type:
+        if search_type not in VALID_SEARCH_TYPES:
+            raise UserInputError(
+                f"search_type '{search_type}' is invalid. Valid values: "
+                f"{', '.join(sorted(VALID_SEARCH_TYPES))}."
+            )
         # GSC exposes this as "type" on the request body.
         body["type"] = search_type
 
@@ -137,6 +156,10 @@ def format_search_analytics_response(response: Dict[str, Any]) -> Dict[str, Any]
     Each returned row carries ``keys`` (the dimension values in request order) plus
     ``clicks``, ``impressions``, ``ctr``, and ``position``, so a caller can read the
     metrics without walking GSC's raw shape.
+
+    ``rowsReturned`` is the count in THIS response, not a grand total (GSC does not
+    return one). When ``rowsReturned`` equals the requested row_limit, more rows may
+    exist; page through them with ``start_row``.
     """
     rows: List[Dict[str, Any]] = []
     for row in response.get("rows", []):
@@ -150,7 +173,7 @@ def format_search_analytics_response(response: Dict[str, Any]) -> Dict[str, Any]
             }
         )
     result: Dict[str, Any] = {
-        "rowCount": len(rows),
+        "rowsReturned": len(rows),
         "rows": rows,
     }
     if "responseAggregationType" in response:
