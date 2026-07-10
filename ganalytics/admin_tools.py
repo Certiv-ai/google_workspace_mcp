@@ -16,6 +16,7 @@ from mcp import Resource
 
 from auth.service_decorator import require_google_service
 from core.server import server
+from core.utils import UserInputError
 from ganalytics.analytics_helpers import (
     handle_ga_errors,
     normalize_account_id,
@@ -540,11 +541,13 @@ async def create_key_event(
         "countingMethod": counting_method,
     }
     if default_value is not None or default_currency_code:
-        require_fields(
-            {"default_value": default_value, "default_currency_code": default_currency_code},
-            ["default_value", "default_currency_code"],
-            "key event default value",
-        )
+        # Both fields are required together. Check with explicit None/empty tests
+        # rather than require_fields so a legitimate default_value of 0 is accepted.
+        if default_value is None or not default_currency_code:
+            raise UserInputError(
+                "key event default value requires both default_value and "
+                "default_currency_code"
+            )
         body["defaultValue"] = {
             "numericValue": default_value,
             "currencyCode": default_currency_code,
