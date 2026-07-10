@@ -89,6 +89,10 @@ SCRIPT_SCRIPTAPP_SCOPE = "https://www.googleapis.com/auth/script.scriptapp"
 ANALYTICS_READONLY_SCOPE = "https://www.googleapis.com/auth/analytics.readonly"
 ANALYTICS_EDIT_SCOPE = "https://www.googleapis.com/auth/analytics.edit"
 
+# Google Search Console (webmasters) scopes
+SEARCH_CONSOLE_READONLY_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
+SEARCH_CONSOLE_SCOPE = "https://www.googleapis.com/auth/webmasters"
+
 # Google scope hierarchy: broader scopes that implicitly cover narrower ones.
 # See https://developers.google.com/gmail/api/auth/scopes,
 # https://developers.google.com/drive/api/guides/api-specific-auth, etc.
@@ -114,6 +118,8 @@ SCOPE_HIERARCHY = {
     # Note: analytics.edit is intentionally NOT mapped as covering analytics.readonly.
     # The GA4 Data API (analyticsdata) requires analytics.readonly specifically, so the
     # "analytics" tool always requests both scopes rather than relying on a hierarchy.
+    # The webmasters (Search Console) full scope does cover its readonly scope.
+    SEARCH_CONSOLE_SCOPE: {SEARCH_CONSOLE_READONLY_SCOPE},
 }
 
 
@@ -205,6 +211,10 @@ SCRIPT_SCOPES = [
 # Admin API writes, analytics.readonly is required by the Data API for reporting.
 ANALYTICS_SCOPES = [ANALYTICS_READONLY_SCOPE, ANALYTICS_EDIT_SCOPE]
 
+# Google Search Console (webmasters) scopes. Both are requested together: webmasters
+# covers sitemap submit/delete writes, webmasters.readonly covers the reporting reads.
+SEARCH_CONSOLE_SCOPES = [SEARCH_CONSOLE_READONLY_SCOPE, SEARCH_CONSOLE_SCOPE]
+
 # Tool-to-scopes mapping
 TOOL_SCOPES_MAP = {
     "gmail": GMAIL_SCOPES,
@@ -220,6 +230,7 @@ TOOL_SCOPES_MAP = {
     "search": CUSTOM_SEARCH_SCOPES,
     "appscript": SCRIPT_SCOPES,
     "analytics": ANALYTICS_SCOPES,
+    "searchconsole": SEARCH_CONSOLE_SCOPES,
 }
 
 # Tool-to-read-only-scopes mapping
@@ -243,6 +254,7 @@ TOOL_READONLY_SCOPES_MAP = {
         DRIVE_READONLY_SCOPE,
     ],
     "analytics": [ANALYTICS_READONLY_SCOPE],
+    "searchconsole": [SEARCH_CONSOLE_READONLY_SCOPE],
 }
 
 

@@ -194,6 +194,19 @@ analytics:
     - update_event_edit_rule
     - delete_event_edit_rule
 
+searchconsole:
+  core:
+    - list_search_console_sites
+    - get_site
+    - query_search_analytics
+    - list_sitemaps
+  extended:
+    - get_sitemap
+    - inspect_url
+  complete:
+    - submit_sitemap
+    - delete_sitemap
+
 appscript:
   core:
     - list_script_projects

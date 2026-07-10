@@ -15,6 +15,7 @@ API_ENABLEMENT_LINKS: Dict[str, str] = {
     "customsearch.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=customsearch.googleapis.com",
     "analyticsadmin.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsadmin.googleapis.com",
     "analyticsdata.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsdata.googleapis.com",
+    "searchconsole.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=searchconsole.googleapis.com",
 }
 
 
@@ -31,6 +32,7 @@ SERVICE_NAME_TO_API: Dict[str, str] = {
     "Google Custom Search": "customsearch.googleapis.com",
     "Google Analytics Admin": "analyticsadmin.googleapis.com",
     "Google Analytics Data": "analyticsdata.googleapis.com",
+    "Google Search Console": "searchconsole.googleapis.com",
 }
 
 
@@ -48,6 +50,7 @@ INTERNAL_SERVICE_TO_API: Dict[str, str] = {
     "search": "customsearch.googleapis.com",
     "analyticsadmin": "analyticsadmin.googleapis.com",
     "analyticsdata": "analyticsdata.googleapis.com",
+    "searchconsole": "searchconsole.googleapis.com",
 }
 
 
