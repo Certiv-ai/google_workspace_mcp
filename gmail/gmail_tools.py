@@ -3542,7 +3542,7 @@ async def batch_modify_gmail_message_labels(
 
 @server.tool()
 @handle_http_errors("forward_gmail_message", service_type="gmail")
-@require_google_service("gmail", GMAIL_SEND_SCOPE)
+@require_google_service("gmail", ["gmail_read", GMAIL_SEND_SCOPE])
 async def forward_gmail_message(
     service,
     user_google_email: str,
