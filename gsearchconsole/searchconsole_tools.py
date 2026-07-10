@@ -113,8 +113,8 @@ async def query_search_analytics(
         search_type: Optional result type; one of "web", "image", "video", "news",
             "discover", "googleNews" (API field "type").
         aggregation_type: Optional "auto", "byPage", or "byProperty".
-        data_state: Optional "final" (default) or "all" (include fresh, not-yet-final
-            data).
+        data_state: Optional data freshness: "full" (finalized data only) or "all"
+            (include fresh, still-being-processed data). Omit to use the API default.
 
     Returns:
         Flattened analytics: {"dimensions", "rowCount", "rows", "responseAggregationType"}
