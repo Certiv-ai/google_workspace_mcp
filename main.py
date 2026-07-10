@@ -172,6 +172,7 @@ def main():
             "search",
             "appscript",
             "analytics",
+            "searchconsole",
         ],
         help="Specify which tools to register. If not provided, all tools are registered.",
     )
@@ -312,6 +313,7 @@ def main():
             import_module("ganalytics.admin_tools"),
             import_module("ganalytics.data_tools"),
         ),
+        "searchconsole": lambda: import_module("gsearchconsole.searchconsole_tools"),
     }
 
     tool_icons = {
@@ -328,6 +330,7 @@ def main():
         "search": "🔍",
         "appscript": "📜",
         "analytics": "📈",
+        "searchconsole": "🔎",
     }
 
     # Determine which tools to import based on arguments

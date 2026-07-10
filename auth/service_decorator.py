@@ -57,6 +57,8 @@ from auth.scopes import (
     SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
     ANALYTICS_READONLY_SCOPE,
     ANALYTICS_EDIT_SCOPE,
+    SEARCHCONSOLE_READONLY_SCOPE,
+    SEARCHCONSOLE_SCOPE,
     has_required_scopes,
 )
 
@@ -421,6 +423,8 @@ SERVICE_CONFIGS = {
     "analyticsadmin": {"service": "analyticsadmin", "version": "v1beta"},
     # GA4 Data API (read/verify side).
     "analyticsdata": {"service": "analyticsdata", "version": "v1beta"},
+    # Search Console API (sites, Search Analytics, sitemaps, URL inspection).
+    "searchconsole": {"service": "searchconsole", "version": "v1"},
 }
 
 
@@ -474,6 +478,9 @@ SCOPE_GROUPS = {
     # Google Analytics (GA4) scopes
     "analytics_read": ANALYTICS_READONLY_SCOPE,
     "analytics_edit": ANALYTICS_EDIT_SCOPE,
+    # Google Search Console (webmasters) scopes
+    "searchconsole_read": SEARCHCONSOLE_READONLY_SCOPE,
+    "searchconsole_write": SEARCHCONSOLE_SCOPE,
 }
 
 

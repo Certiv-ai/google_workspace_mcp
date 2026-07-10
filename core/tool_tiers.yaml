@@ -203,3 +203,16 @@ appscript:
     - list_script_processes
     - get_script_metrics
   complete: []
+
+searchconsole:
+  core:
+    - list_search_console_sites
+    - get_site
+    - query_search_analytics
+    - list_sitemaps
+    - get_sitemap
+  extended:
+    - inspect_url
+    - submit_sitemap
+    - delete_sitemap
+  complete: []
