@@ -23,6 +23,11 @@ VALID_DIMENSIONS = frozenset(
     {"query", "page", "country", "device", "searchAppearance", "date"}
 )
 
+# Search Analytics "type" (search type) values accepted by the API.
+VALID_SEARCH_TYPES = frozenset(
+    {"web", "image", "video", "news", "discover", "googleNews"}
+)
+
 
 def require_non_empty(value: str, label: str) -> str:
     """Return a stripped string, raising UserInputError when it is missing/empty."""
@@ -56,6 +61,26 @@ def validate_dimensions(dimensions: Optional[List[str]]) -> List[str]:
     return cleaned
 
 
+def validate_search_type(search_type: Optional[str]) -> Optional[str]:
+    """
+    Validate the Search Analytics search type against the API's accepted set.
+
+    Returns the stripped value, or None when none is supplied. Raises UserInputError naming
+    the unsupported value so the caller gets a clear message instead of an opaque 400.
+    """
+    if search_type is None:
+        return None
+    name = str(search_type).strip()
+    if not name:
+        return None
+    if name not in VALID_SEARCH_TYPES:
+        raise UserInputError(
+            f"search_type '{name}' is not supported; valid types are: "
+            f"{', '.join(sorted(VALID_SEARCH_TYPES))}"
+        )
+    return name
+
+
 def build_search_analytics_body(
     start_date: str,
     end_date: str,
@@ -86,8 +111,9 @@ def build_search_analytics_body(
         body["startRow"] = start_row
     if dimension_filter_groups:
         body["dimensionFilterGroups"] = dimension_filter_groups
-    if search_type:
-        body["type"] = search_type
+    validated_search_type = validate_search_type(search_type)
+    if validated_search_type:
+        body["type"] = validated_search_type
     if aggregation_type:
         body["aggregationType"] = aggregation_type
     if data_state:

@@ -22,7 +22,6 @@ from gsearchconsole.searchconsole_helpers import (
     format_search_analytics_response,
     handle_gsc_errors,
     require_non_empty,
-    validate_dimensions,
 )
 
 logger = logging.getLogger(__name__)
@@ -136,7 +135,9 @@ async def query_search_analytics(
         data_state=data_state,
     )
     response = service.searchanalytics().query(siteUrl=site, body=body).execute()
-    return format_search_analytics_response(response, validate_dimensions(dimensions))
+    # body["dimensions"] is the already-validated list (or absent for site-wide totals);
+    # reuse it so validation runs exactly once, in build_search_analytics_body.
+    return format_search_analytics_response(response, body.get("dimensions", []))
 
 
 @server.tool()

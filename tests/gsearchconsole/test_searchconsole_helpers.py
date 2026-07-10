@@ -24,6 +24,7 @@ from gsearchconsole.searchconsole_helpers import (  # noqa: E402
     require_non_empty,
     summarize_gsc_error,
     validate_dimensions,
+    validate_search_type,
 )
 
 
@@ -58,6 +59,21 @@ class TestValidateDimensions:
             validate_dimensions(["  "])
 
 
+class TestValidateSearchType:
+    def test_none_passthrough(self):
+        assert validate_search_type(None) is None
+
+    def test_blank_is_none(self):
+        assert validate_search_type("  ") is None
+
+    def test_valid_passthrough(self):
+        assert validate_search_type("web") == "web"
+
+    def test_unknown_raises(self):
+        with pytest.raises(UserInputError):
+            validate_search_type("websearch")
+
+
 class TestBuildSearchAnalyticsBody:
     def test_minimal_body(self):
         body = build_search_analytics_body("2024-01-01", "2024-01-31")
@@ -90,6 +106,12 @@ class TestBuildSearchAnalyticsBody:
     def test_invalid_dimension_raises(self):
         with pytest.raises(UserInputError):
             build_search_analytics_body("2024-01-01", "2024-01-31", dimensions=["nope"])
+
+    def test_invalid_search_type_raises(self):
+        with pytest.raises(UserInputError):
+            build_search_analytics_body(
+                "2024-01-01", "2024-01-31", search_type="websearch"
+            )
 
 
 class TestFormatSearchAnalyticsResponse:
