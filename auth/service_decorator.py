@@ -64,6 +64,8 @@ from auth.scopes import (
     SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
     ANALYTICS_READONLY_SCOPE,
     ANALYTICS_EDIT_SCOPE,
+    SEARCH_CONSOLE_READONLY_SCOPE,
+    SEARCH_CONSOLE_SCOPE,
     SCRIPT_EXTERNAL_REQUEST_SCOPE,
     SCRIPT_SCRIPTAPP_SCOPE,
     has_required_scopes,
@@ -535,6 +537,9 @@ SERVICE_CONFIGS = {
     "analyticsadmin": {"service": "analyticsadmin", "version": "v1beta"},
     # GA4 Data API (read/verify side).
     "analyticsdata": {"service": "analyticsdata", "version": "v1beta"},
+    # Google Search Console API (v1 covers sites, sitemaps, searchanalytics, and
+    # urlInspection; supersedes the legacy webmasters v3 discovery).
+    "searchconsole": {"service": "searchconsole", "version": "v1"},
 }
 
 
@@ -593,6 +598,9 @@ SCOPE_GROUPS = {
     # Google Analytics (GA4) scopes
     "analytics_read": ANALYTICS_READONLY_SCOPE,
     "analytics_edit": ANALYTICS_EDIT_SCOPE,
+    # Google Search Console (webmasters) scopes
+    "searchconsole_read": SEARCH_CONSOLE_READONLY_SCOPE,
+    "searchconsole": SEARCH_CONSOLE_SCOPE,
 }
 
 

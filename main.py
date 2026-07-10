@@ -190,6 +190,7 @@ SERVICE_MODULES = {
     "search": "gsearch.search_tools",
     "appscript": "gappsscript.apps_script_tools",
     "analytics": "ganalytics",
+    "searchconsole": "gsearchconsole",
 }
 VALID_SERVICES = frozenset(SERVICE_MODULES)
 
@@ -579,6 +580,7 @@ def main():
         "search": "🔍",
         "appscript": "📜",
         "analytics": "📈",
+        "searchconsole": "🔎",
     }
 
     # Determine which tools to import based on arguments
