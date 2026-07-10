@@ -17,6 +17,7 @@ from mcp import Resource
 
 from auth.service_decorator import require_google_service
 from core.server import server
+from core.utils import UserInputError
 from ganalytics.analytics_helpers import (
     build_date_ranges,
     build_named_objects,
@@ -73,9 +74,12 @@ async def run_report(
         A flattened report: {"dimensionHeaders", "metricHeaders", "rowCount", "rows"}.
     """
     logger.info(f"[run_report] Invoked. Email: '{user_google_email}'")
+    metric_objects = build_named_objects(metrics, "metrics")
+    if not metric_objects:
+        raise UserInputError("run_report requires at least one metric")
     body: Dict[str, Any] = {
         "dimensions": build_named_objects(dimensions, "dimensions"),
-        "metrics": build_named_objects(metrics, "metrics"),
+        "metrics": metric_objects,
         "dateRanges": build_date_ranges(date_ranges),
         "keepEmptyRows": keep_empty_rows,
     }
@@ -132,9 +136,12 @@ async def run_realtime_report(
         A flattened report: {"dimensionHeaders", "metricHeaders", "rowCount", "rows"}.
     """
     logger.info(f"[run_realtime_report] Invoked. Email: '{user_google_email}'")
+    metric_objects = build_named_objects(metrics, "metrics")
+    if not metric_objects:
+        raise UserInputError("run_realtime_report requires at least one metric")
     body: Dict[str, Any] = {
         "dimensions": build_named_objects(dimensions, "dimensions"),
-        "metrics": build_named_objects(metrics, "metrics"),
+        "metrics": metric_objects,
     }
     if dimension_filter:
         body["dimensionFilter"] = dimension_filter

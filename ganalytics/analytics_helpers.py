@@ -8,7 +8,7 @@ common GA4 blockers (missing OAuth scopes and a missing property/account role gr
 
 import functools
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from googleapiclient.errors import HttpError  # type: ignore
 

@@ -202,7 +202,6 @@ async def create_custom_dimension(
         body["description"] = description
     if disallow_ads_personalization:
         body["disallowAdsPersonalization"] = True
-    require_fields(body, ["parameterName", "displayName", "scope"], "custom dimension")
     return (
         service.properties()
         .customDimensions()
@@ -251,8 +250,10 @@ async def update_custom_dimension(
         body["disallowAdsPersonalization"] = disallow_ads_personalization
         update_mask.append("disallowAdsPersonalization")
     if not update_mask:
-        require_fields({}, ["display_name|description|disallow_ads_personalization"],
-                       "update_custom_dimension")
+        raise UserInputError(
+            "update_custom_dimension requires at least one of: display_name, "
+            "description, disallow_ads_personalization"
+        )
     return (
         service.properties()
         .customDimensions()
@@ -375,11 +376,6 @@ async def create_custom_metric(
         body["description"] = description
     if restricted_metric_types:
         body["restrictedMetricType"] = restricted_metric_types
-    require_fields(
-        body,
-        ["parameterName", "displayName", "measurementUnit", "scope"],
-        "custom metric",
-    )
     return (
         service.properties()
         .customMetrics()
@@ -432,8 +428,10 @@ async def update_custom_metric(
         body["restrictedMetricType"] = restricted_metric_types
         update_mask.append("restrictedMetricType")
     if not update_mask:
-        require_fields({}, ["display_name|description|measurement_unit|"
-                            "restricted_metric_types"], "update_custom_metric")
+        raise UserInputError(
+            "update_custom_metric requires at least one of: display_name, "
+            "description, measurement_unit, restricted_metric_types"
+        )
     return (
         service.properties()
         .customMetrics()
@@ -834,8 +832,9 @@ async def update_event_create_rule(
         The updated eventCreateRule resource.
     """
     logger.info(f"[update_event_create_rule] Invoked. Email: '{user_google_email}'")
+    if not rule:
+        raise UserInputError("update_event_create_rule requires a non-empty rule body")
     mask = update_mask if update_mask else list(rule.keys())
-    require_fields({"rule": rule}, ["rule"], "update_event_create_rule")
     return (
         service.properties()
         .dataStreams()
@@ -983,8 +982,9 @@ async def update_event_edit_rule(
         The updated eventEditRule resource.
     """
     logger.info(f"[update_event_edit_rule] Invoked. Email: '{user_google_email}'")
+    if not rule:
+        raise UserInputError("update_event_edit_rule requires a non-empty rule body")
     mask = update_mask if update_mask else list(rule.keys())
-    require_fields({"rule": rule}, ["rule"], "update_event_edit_rule")
     return (
         service.properties()
         .dataStreams()
