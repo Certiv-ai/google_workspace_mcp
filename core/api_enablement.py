@@ -13,6 +13,8 @@ API_ENABLEMENT_LINKS: Dict[str, str] = {
     "tasks.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=tasks.googleapis.com",
     "chat.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=chat.googleapis.com",
     "customsearch.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=customsearch.googleapis.com",
+    "analyticsadmin.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsadmin.googleapis.com",
+    "analyticsdata.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsdata.googleapis.com",
 }
 
 
@@ -27,6 +29,8 @@ SERVICE_NAME_TO_API: Dict[str, str] = {
     "Google Tasks": "tasks.googleapis.com",
     "Google Chat": "chat.googleapis.com",
     "Google Custom Search": "customsearch.googleapis.com",
+    "Google Analytics Admin": "analyticsadmin.googleapis.com",
+    "Google Analytics Data": "analyticsdata.googleapis.com",
 }
 
 
@@ -42,6 +46,8 @@ INTERNAL_SERVICE_TO_API: Dict[str, str] = {
     "chat": "chat.googleapis.com",
     "customsearch": "customsearch.googleapis.com",
     "search": "customsearch.googleapis.com",
+    "analyticsadmin": "analyticsadmin.googleapis.com",
+    "analyticsdata": "analyticsdata.googleapis.com",
 }
 
 

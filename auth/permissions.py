@@ -53,6 +53,8 @@ from auth.scopes import (
     SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
     SCRIPT_PROCESSES_READONLY_SCOPE,
     SCRIPT_METRICS_SCOPE,
+    ANALYTICS_READONLY_SCOPE,
+    ANALYTICS_EDIT_SCOPE,
 )
 
 logger = logging.getLogger(__name__)
@@ -108,6 +110,11 @@ SERVICE_PERMISSION_LEVELS: Dict[str, List[Tuple[str, List[str]]]] = {
     "search": [
         ("readonly", [CUSTOM_SEARCH_SCOPE]),
         ("full", [CUSTOM_SEARCH_SCOPE]),
+    ],
+    "analytics": [
+        ("readonly", [ANALYTICS_READONLY_SCOPE]),
+        # full always includes readonly because the GA4 Data API needs it.
+        ("full", [ANALYTICS_EDIT_SCOPE, ANALYTICS_READONLY_SCOPE]),
     ],
     "appscript": [
         (

@@ -55,6 +55,8 @@ from auth.scopes import (
     SCRIPT_PROJECTS_READONLY_SCOPE,
     SCRIPT_DEPLOYMENTS_SCOPE,
     SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
+    ANALYTICS_READONLY_SCOPE,
+    ANALYTICS_EDIT_SCOPE,
     has_required_scopes,
 )
 
@@ -414,6 +416,11 @@ SERVICE_CONFIGS = {
     "people": {"service": "people", "version": "v1"},
     "customsearch": {"service": "customsearch", "version": "v1"},
     "script": {"service": "script", "version": "v1"},
+    # GA4 Admin API (config/write side); v1alpha is selected per-tool via the
+    # decorator's version override for event-create and event-edit rules.
+    "analyticsadmin": {"service": "analyticsadmin", "version": "v1beta"},
+    # GA4 Data API (read/verify side).
+    "analyticsdata": {"service": "analyticsdata", "version": "v1beta"},
 }
 
 
@@ -464,6 +471,9 @@ SCOPE_GROUPS = {
     "script_projects": SCRIPT_PROJECTS_SCOPE,
     "script_deployments": SCRIPT_DEPLOYMENTS_SCOPE,
     "script_deployments_readonly": SCRIPT_DEPLOYMENTS_READONLY_SCOPE,
+    # Google Analytics (GA4) scopes
+    "analytics_read": ANALYTICS_READONLY_SCOPE,
+    "analytics_edit": ANALYTICS_EDIT_SCOPE,
 }
 
 
