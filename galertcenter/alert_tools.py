@@ -47,10 +47,12 @@ async def list_alerts(
     order_by: Optional[str] = None,
     page_size: int = 50,
     page_token: Optional[str] = None,
-    customer_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     List Alert Center alerts for the Google Workspace account, newest useful first.
+
+    Scoped to the authenticated admin's own Google Workspace customer; there is no
+    cross-customer parameter.
 
     Args:
         user_google_email: The user's Google email address. Required.
@@ -62,12 +64,10 @@ async def list_alerts(
         end_time: Upper bound on the alert createTime (RFC3339).
         filter: Raw Alert Center filter string. When provided it is used verbatim and the
             alert_type/source/start_time/end_time shortcuts are ignored.
-        order_by: Sort order, e.g. "create_time desc" (the API default) or
-            "create_time asc".
+        order_by: Sort order, e.g. "createTime desc" (the API default) or
+            "createTime asc"; "updateTime desc" is also supported.
         page_size: Max alerts to return (default 50). The API caps this at 1000.
         page_token: Page token from a previous response for pagination.
-        customer_id: Optional Google Workspace customer id; defaults to the account of the
-            authenticated admin when omitted.
 
     Returns:
         {"rowCount", "alerts": [summary, ...], "nextPageToken"} where each summary carries
@@ -88,8 +88,6 @@ async def list_alerts(
         request_args["orderBy"] = order_by
     if page_token:
         request_args["pageToken"] = page_token
-    if customer_id:
-        request_args["customerId"] = customer_id
 
     response = service.alerts().list(**request_args).execute()
     return format_alerts_list(response)
@@ -102,7 +100,6 @@ async def get_alert(
     service: Resource,
     user_google_email: str,
     alert_id: str,
-    customer_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Get the full Alert resource for a single alert by id.
@@ -110,18 +107,13 @@ async def get_alert(
     Args:
         user_google_email: The user's Google email address. Required.
         alert_id: The alertId (from list_alerts).
-        customer_id: Optional Google Workspace customer id; defaults to the authenticated
-            admin's account when omitted.
 
     Returns:
         The full Alert resource, including its data payload and metadata.
     """
     logger.info(f"[get_alert] Invoked. Email: '{user_google_email}'")
     alert = require_non_empty(alert_id, "alert_id")
-    request_args: Dict[str, Any] = {"alertId": alert}
-    if customer_id:
-        request_args["customerId"] = customer_id
-    return service.alerts().get(**request_args).execute()
+    return service.alerts().get(alertId=alert).execute()
 
 
 @server.tool()
@@ -131,7 +123,6 @@ async def get_alert_metadata(
     service: Resource,
     user_google_email: str,
     alert_id: str,
-    customer_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Get the metadata for a single alert (severity, status, assignee, etc.).
@@ -139,18 +130,13 @@ async def get_alert_metadata(
     Args:
         user_google_email: The user's Google email address. Required.
         alert_id: The alertId (from list_alerts).
-        customer_id: Optional Google Workspace customer id; defaults to the authenticated
-            admin's account when omitted.
 
     Returns:
         The AlertMetadata resource for the alert.
     """
     logger.info(f"[get_alert_metadata] Invoked. Email: '{user_google_email}'")
     alert = require_non_empty(alert_id, "alert_id")
-    request_args: Dict[str, Any] = {"alertId": alert}
-    if customer_id:
-        request_args["customerId"] = customer_id
-    return service.alerts().getMetadata(**request_args).execute()
+    return service.alerts().getMetadata(alertId=alert).execute()
 
 
 @server.tool()
@@ -161,7 +147,6 @@ async def list_alert_feedback(
     user_google_email: str,
     alert_id: str,
     filter: Optional[str] = None,
-    customer_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     List the feedback entries left on a single alert.
@@ -170,8 +155,6 @@ async def list_alert_feedback(
         user_google_email: The user's Google email address. Required.
         alert_id: The alertId (from list_alerts).
         filter: Optional Alert Center filter string over the feedback collection.
-        customer_id: Optional Google Workspace customer id; defaults to the authenticated
-            admin's account when omitted.
 
     Returns:
         The feedback.list response ({"feedback": [{"feedbackId", "type", ...}, ...]}).
@@ -181,6 +164,4 @@ async def list_alert_feedback(
     request_args: Dict[str, Any] = {"alertId": alert}
     if filter:
         request_args["filter"] = filter
-    if customer_id:
-        request_args["customerId"] = customer_id
     return service.alerts().feedback().list(**request_args).execute()

@@ -11,7 +11,7 @@ consented; see summarize_alert_center_error for the exact guidance surfaced on 4
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 from mcp import Resource
 
@@ -37,7 +37,6 @@ async def create_alert_feedback(
     user_google_email: str,
     alert_id: str,
     feedback_type: str,
-    customer_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Leave feedback on an alert, marking it useful or not useful (non-destructive triage).
@@ -48,8 +47,6 @@ async def create_alert_feedback(
         feedback_type: One of ALERT_FEEDBACK_TYPE_UNSPECIFIED, NOT_USEFUL,
             SOMEWHAT_USEFUL, VERY_USEFUL. Use NOT_USEFUL to mark an alert benign and
             VERY_USEFUL / SOMEWHAT_USEFUL to mark it actionable.
-        customer_id: Optional Google Workspace customer id; defaults to the authenticated
-            admin's account when omitted.
 
     Returns:
         The created AlertFeedback resource ({"feedbackId", "type", "createTime", ...}).
@@ -57,7 +54,4 @@ async def create_alert_feedback(
     logger.info(f"[create_alert_feedback] Invoked. Email: '{user_google_email}'")
     alert = require_non_empty(alert_id, "alert_id")
     body = build_feedback_body(feedback_type)
-    request_args: Dict[str, Any] = {"alertId": alert, "body": body}
-    if customer_id:
-        request_args["customerId"] = customer_id
-    return service.alerts().feedback().create(**request_args).execute()
+    return service.alerts().feedback().create(alertId=alert, body=body).execute()
