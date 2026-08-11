@@ -207,6 +207,16 @@ searchconsole:
     - submit_sitemap
     - delete_sitemap
 
+alertcenter:
+  core:
+    - list_alerts
+    - get_alert
+    - create_alert_feedback
+  extended:
+    - get_alert_metadata
+    - list_alert_feedback
+  complete: []
+
 appscript:
   core:
     - list_script_projects

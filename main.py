@@ -191,6 +191,7 @@ SERVICE_MODULES = {
     "appscript": "gappsscript.apps_script_tools",
     "analytics": "ganalytics",
     "searchconsole": "gsearchconsole",
+    "alertcenter": "galertcenter",
 }
 VALID_SERVICES = frozenset(SERVICE_MODULES)
 
@@ -581,6 +582,7 @@ def main():
         "appscript": "📜",
         "analytics": "📈",
         "searchconsole": "🔎",
+        "alertcenter": "🚨",
     }
 
     # Determine which tools to import based on arguments

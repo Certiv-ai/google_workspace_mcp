@@ -93,6 +93,14 @@ ANALYTICS_EDIT_SCOPE = "https://www.googleapis.com/auth/analytics.edit"
 SEARCH_CONSOLE_READONLY_SCOPE = "https://www.googleapis.com/auth/webmasters.readonly"
 SEARCH_CONSOLE_SCOPE = "https://www.googleapis.com/auth/webmasters"
 
+# Google Workspace Alert Center scopes. Google publishes exactly one Alert Center scope
+# (apps.alerts, read + write); there is no separate apps.alerts.readonly scope. The
+# readonly constant below is a logical "read requirement" that the full apps.alerts scope
+# satisfies via SCOPE_HIERARCHY, so consent only ever requests the real apps.alerts scope
+# (see ALERT_CENTER_SCOPES / TOOL_READONLY_SCOPES_MAP below).
+ALERT_CENTER_SCOPE = "https://www.googleapis.com/auth/apps.alerts"
+ALERT_CENTER_READONLY_SCOPE = "https://www.googleapis.com/auth/apps.alerts.readonly"
+
 # Google scope hierarchy: broader scopes that implicitly cover narrower ones.
 # See https://developers.google.com/gmail/api/auth/scopes,
 # https://developers.google.com/drive/api/guides/api-specific-auth, etc.
@@ -120,6 +128,9 @@ SCOPE_HIERARCHY = {
     # "analytics" tool always requests both scopes rather than relying on a hierarchy.
     # The webmasters (Search Console) full scope does cover its readonly scope.
     SEARCH_CONSOLE_SCOPE: {SEARCH_CONSOLE_READONLY_SCOPE},
+    # The single apps.alerts scope covers the logical Alert Center read requirement
+    # (there is no real apps.alerts.readonly scope published by Google).
+    ALERT_CENTER_SCOPE: {ALERT_CENTER_READONLY_SCOPE},
 }
 
 
@@ -215,6 +226,11 @@ ANALYTICS_SCOPES = [ANALYTICS_READONLY_SCOPE, ANALYTICS_EDIT_SCOPE]
 # covers sitemap submit/delete writes, webmasters.readonly covers the reporting reads.
 SEARCH_CONSOLE_SCOPES = [SEARCH_CONSOLE_READONLY_SCOPE, SEARCH_CONSOLE_SCOPE]
 
+# Google Workspace Alert Center scopes. Only the real apps.alerts scope is ever requested
+# at consent (Google publishes no apps.alerts.readonly scope); it covers both the read
+# tools and the feedback-write tool. The readonly constant is intentionally NOT requested.
+ALERT_CENTER_SCOPES = [ALERT_CENTER_SCOPE]
+
 # Tool-to-scopes mapping
 TOOL_SCOPES_MAP = {
     "gmail": GMAIL_SCOPES,
@@ -231,6 +247,7 @@ TOOL_SCOPES_MAP = {
     "appscript": SCRIPT_SCOPES,
     "analytics": ANALYTICS_SCOPES,
     "searchconsole": SEARCH_CONSOLE_SCOPES,
+    "alertcenter": ALERT_CENTER_SCOPES,
 }
 
 # Tool-to-read-only-scopes mapping
@@ -255,6 +272,9 @@ TOOL_READONLY_SCOPES_MAP = {
     ],
     "analytics": [ANALYTICS_READONLY_SCOPE],
     "searchconsole": [SEARCH_CONSOLE_READONLY_SCOPE],
+    # Alert Center has no readonly scope, so even read-only mode must request the full
+    # apps.alerts scope (it is the only scope Google publishes for this API).
+    "alertcenter": [ALERT_CENTER_SCOPE],
 }
 
 
