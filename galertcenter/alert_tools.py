@@ -49,7 +49,7 @@ async def list_alerts(
     page_token: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
-    List Alert Center alerts for the Google Workspace account, newest useful first.
+    List Alert Center alerts for the Google Workspace account, newest first by default.
 
     Scoped to the authenticated admin's own Google Workspace customer; there is no
     cross-customer parameter.
@@ -64,8 +64,9 @@ async def list_alerts(
         end_time: Upper bound on the alert createTime (RFC3339).
         filter: Raw Alert Center filter string. When provided it is used verbatim and the
             alert_type/source/start_time/end_time shortcuts are ignored.
-        order_by: Sort order, e.g. "createTime desc" (the API default) or
-            "createTime asc"; "updateTime desc" is also supported.
+        order_by: Sort order. Defaults to "createTime desc" (newest first) since the API
+            leaves ordering unspecified when omitted. Also accepts "createTime asc" and
+            "updateTime desc".
         page_size: Max alerts to return (default 50). The API caps this at 1000.
         page_token: Page token from a previous response for pagination.
 
@@ -81,11 +82,12 @@ async def list_alerts(
         start_time=start_time,
         end_time=end_time,
     )
-    request_args: Dict[str, Any] = {"pageSize": page_size}
+    request_args: Dict[str, Any] = {
+        "pageSize": page_size,
+        "orderBy": order_by or "createTime desc",
+    }
     if effective_filter:
         request_args["filter"] = effective_filter
-    if order_by:
-        request_args["orderBy"] = order_by
     if page_token:
         request_args["pageToken"] = page_token
 

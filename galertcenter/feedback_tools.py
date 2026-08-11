@@ -2,8 +2,10 @@
 Google Workspace Alert Center Feedback Tools
 
 Feedback side of the Alert Center, backed by the Alert Center API (alertcenter v1beta1).
-create_alert_feedback marks an alert useful or not useful; this is the non-destructive way
-to triage an alert as benign or actionable (it never deletes, undeletes, or hides alerts).
+create_alert_feedback records whether an alert report was useful. It is non-destructive
+and, importantly, does NOT triage or resolve the alert: it never changes the alert's
+status, assignee, or visibility, and never deletes/undeletes/hides alerts. It only signals
+alert quality back to Google.
 
 This tool requires the full apps.alerts scope. Every call 403s until paul@certiv.ai is a
 Google Workspace admin with Alert Center privileges and the apps.alerts scope is
@@ -39,14 +41,18 @@ async def create_alert_feedback(
     feedback_type: str,
 ) -> Dict[str, Any]:
     """
-    Leave feedback on an alert, marking it useful or not useful (non-destructive triage).
+    Rate how useful an alert was (non-destructive; does NOT triage or close the alert).
+
+    This records feedback on the alert report's quality only. It does not change the
+    alert's status, assignee, or visibility and does not resolve/close it; use the Alert
+    Center console (or a dedicated status update) for actual triage.
 
     Args:
         user_google_email: The user's Google email address. Required.
         alert_id: The alertId (from list_alerts).
         feedback_type: One of ALERT_FEEDBACK_TYPE_UNSPECIFIED, NOT_USEFUL,
-            SOMEWHAT_USEFUL, VERY_USEFUL. Use NOT_USEFUL to mark an alert benign and
-            VERY_USEFUL / SOMEWHAT_USEFUL to mark it actionable.
+            SOMEWHAT_USEFUL, VERY_USEFUL. NOT_USEFUL flags a low-value / false-positive
+            alert; VERY_USEFUL / SOMEWHAT_USEFUL flag a valuable one.
 
     Returns:
         The created AlertFeedback resource ({"feedbackId", "type", "createTime", ...}).
