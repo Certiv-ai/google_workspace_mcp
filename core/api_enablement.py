@@ -16,6 +16,7 @@ API_ENABLEMENT_LINKS: Dict[str, str] = {
     "analyticsadmin.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsadmin.googleapis.com",
     "analyticsdata.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=analyticsdata.googleapis.com",
     "searchconsole.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=searchconsole.googleapis.com",
+    "alertcenter.googleapis.com": "https://console.cloud.google.com/flows/enableapi?apiid=alertcenter.googleapis.com",
 }
 
 
@@ -33,6 +34,7 @@ SERVICE_NAME_TO_API: Dict[str, str] = {
     "Google Analytics Admin": "analyticsadmin.googleapis.com",
     "Google Analytics Data": "analyticsdata.googleapis.com",
     "Google Search Console": "searchconsole.googleapis.com",
+    "Google Workspace Alert Center": "alertcenter.googleapis.com",
 }
 
 
@@ -51,6 +53,7 @@ INTERNAL_SERVICE_TO_API: Dict[str, str] = {
     "analyticsadmin": "analyticsadmin.googleapis.com",
     "analyticsdata": "analyticsdata.googleapis.com",
     "searchconsole": "searchconsole.googleapis.com",
+    "alertcenter": "alertcenter.googleapis.com",
 }
 
 

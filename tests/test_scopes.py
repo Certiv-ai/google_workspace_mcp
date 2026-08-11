@@ -12,6 +12,8 @@ import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from auth.scopes import (
+    ALERT_CENTER_READONLY_SCOPE,
+    ALERT_CENTER_SCOPE,
     BASE_SCOPES,
     CALENDAR_READONLY_SCOPE,
     CALENDAR_SCOPE,
@@ -109,6 +111,34 @@ class TestReadOnlyScopes:
         set_read_only(True)
         scopes = get_scopes_for_tools(["sheets"])
         assert DRIVE_READONLY_SCOPE in scopes
+
+
+class TestAlertCenterScopes:
+    """Tests for Alert Center scope generation.
+
+    Google publishes only the single apps.alerts scope, so consent must request that
+    scope (never a nonexistent apps.alerts.readonly) in both full and read-only mode.
+    """
+
+    def setup_method(self):
+        set_read_only(False)
+
+    def teardown_method(self):
+        set_read_only(False)
+
+    def test_full_mode_requests_apps_alerts(self):
+        scopes = get_scopes_for_tools(["alertcenter"])
+        assert ALERT_CENTER_SCOPE in scopes
+        assert ALERT_CENTER_READONLY_SCOPE not in scopes
+
+    def test_read_only_mode_still_requests_apps_alerts(self):
+        set_read_only(True)
+        scopes = get_scopes_for_tools(["alertcenter"])
+        assert ALERT_CENTER_SCOPE in scopes
+        assert ALERT_CENTER_READONLY_SCOPE not in scopes
+
+    def test_full_scope_satisfies_read_requirement(self):
+        assert has_required_scopes([ALERT_CENTER_SCOPE], [ALERT_CENTER_READONLY_SCOPE])
 
 
 class TestHasRequiredScopes:

@@ -66,6 +66,8 @@ from auth.scopes import (
     ANALYTICS_EDIT_SCOPE,
     SEARCH_CONSOLE_READONLY_SCOPE,
     SEARCH_CONSOLE_SCOPE,
+    ALERT_CENTER_SCOPE,
+    ALERT_CENTER_READONLY_SCOPE,
     SCRIPT_EXTERNAL_REQUEST_SCOPE,
     SCRIPT_SCRIPTAPP_SCOPE,
     has_required_scopes,
@@ -540,6 +542,9 @@ SERVICE_CONFIGS = {
     # Google Search Console API (v1 covers sites, sitemaps, searchanalytics, and
     # urlInspection; supersedes the legacy webmasters v3 discovery).
     "searchconsole": {"service": "searchconsole", "version": "v1"},
+    # Google Workspace Alert Center API (v1beta1 is the only published version; covers
+    # alerts list/get/getMetadata and alerts.feedback list/create).
+    "alertcenter": {"service": "alertcenter", "version": "v1beta1"},
 }
 
 
@@ -601,6 +606,11 @@ SCOPE_GROUPS = {
     # Google Search Console (webmasters) scopes
     "searchconsole_read": SEARCH_CONSOLE_READONLY_SCOPE,
     "searchconsole": SEARCH_CONSOLE_SCOPE,
+    # Google Workspace Alert Center scopes. The read group resolves to the logical
+    # readonly scope (covered by the full apps.alerts scope via SCOPE_HIERARCHY); the
+    # write group resolves to the real apps.alerts scope.
+    "alertcenter_read": ALERT_CENTER_READONLY_SCOPE,
+    "alertcenter": ALERT_CENTER_SCOPE,
 }
 
 
