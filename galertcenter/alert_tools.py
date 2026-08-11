@@ -14,7 +14,7 @@ summarize_alert_center_error for the exact guidance surfaced on 403.
 """
 
 import logging
-from typing import Any, Dict, Optional
+from typing import Any
 
 from mcp import Resource
 
@@ -39,15 +39,15 @@ READ = "alertcenter_read"
 async def list_alerts(
     service: Resource,
     user_google_email: str,
-    alert_type: Optional[str] = None,
-    source: Optional[str] = None,
-    start_time: Optional[str] = None,
-    end_time: Optional[str] = None,
-    filter: Optional[str] = None,
-    order_by: Optional[str] = None,
+    alert_type: str | None = None,
+    source: str | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+    filter: str | None = None,
+    order_by: str | None = None,
     page_size: int = 50,
-    page_token: Optional[str] = None,
-) -> Dict[str, Any]:
+    page_token: str | None = None,
+) -> dict[str, Any]:
     """
     List Alert Center alerts for the Google Workspace account, newest first by default.
 
@@ -82,7 +82,7 @@ async def list_alerts(
         start_time=start_time,
         end_time=end_time,
     )
-    request_args: Dict[str, Any] = {
+    request_args: dict[str, Any] = {
         "pageSize": page_size,
         "orderBy": order_by or "createTime desc",
     }
@@ -102,7 +102,7 @@ async def get_alert(
     service: Resource,
     user_google_email: str,
     alert_id: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get the full Alert resource for a single alert by id.
 
@@ -125,7 +125,7 @@ async def get_alert_metadata(
     service: Resource,
     user_google_email: str,
     alert_id: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Get the metadata for a single alert (severity, status, assignee, etc.).
 
@@ -148,8 +148,8 @@ async def list_alert_feedback(
     service: Resource,
     user_google_email: str,
     alert_id: str,
-    filter: Optional[str] = None,
-) -> Dict[str, Any]:
+    filter: str | None = None,
+) -> dict[str, Any]:
     """
     List the feedback entries left on a single alert.
 
@@ -163,7 +163,7 @@ async def list_alert_feedback(
     """
     logger.info(f"[list_alert_feedback] Invoked. Email: '{user_google_email}'")
     alert = require_non_empty(alert_id, "alert_id")
-    request_args: Dict[str, Any] = {"alertId": alert}
+    request_args: dict[str, Any] = {"alertId": alert}
     if filter:
         request_args["filter"] = filter
     return service.alerts().feedback().list(**request_args).execute()

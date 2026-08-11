@@ -15,10 +15,10 @@ from httplib2 import Response
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from googleapiclient.errors import HttpError  # noqa: E402
+from googleapiclient.errors import HttpError
 
-from core.utils import UserInputError  # noqa: E402
-from galertcenter.alertcenter_helpers import (  # noqa: E402
+from core.utils import UserInputError
+from galertcenter.alertcenter_helpers import (
     build_alerts_filter,
     build_feedback_body,
     format_alerts_list,

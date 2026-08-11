@@ -9,7 +9,7 @@ not being a Google Workspace admin with Alert Center access).
 
 import functools
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from googleapiclient.errors import HttpError  # type: ignore
 
@@ -45,11 +45,11 @@ def _quote(value: str) -> str:
 
 
 def build_alerts_filter(
-    alert_type: Optional[str] = None,
-    source: Optional[str] = None,
-    start_time: Optional[str] = None,
-    end_time: Optional[str] = None,
-) -> Optional[str]:
+    alert_type: str | None = None,
+    source: str | None = None,
+    start_time: str | None = None,
+    end_time: str | None = None,
+) -> str | None:
     """
     Build an Alert Center ``alerts.list`` filter string from structured arguments.
 
@@ -59,7 +59,7 @@ def build_alerts_filter(
     Clauses are combined with AND. Returns None when no arguments are supplied so the
     caller can omit the filter entirely.
     """
-    clauses: List[str] = []
+    clauses: list[str] = []
     if alert_type and str(alert_type).strip():
         clauses.append(f"type = {_quote(str(alert_type).strip())}")
     if source and str(source).strip():
@@ -73,7 +73,7 @@ def build_alerts_filter(
     return " AND ".join(clauses)
 
 
-def summarize_alert(alert: Dict[str, Any]) -> Dict[str, Any]:
+def summarize_alert(alert: dict[str, Any]) -> dict[str, Any]:
     """
     Reduce a full Alert resource to the fields most useful in a list view.
 
@@ -83,7 +83,7 @@ def summarize_alert(alert: Dict[str, Any]) -> Dict[str, Any]:
     """
     metadata = alert.get("metadata") or {}
     data = alert.get("data") or {}
-    data_summary: Dict[str, Any] = {}
+    data_summary: dict[str, Any] = {}
     if isinstance(data, dict):
         if data.get("@type"):
             data_summary["type"] = data.get("@type")
@@ -103,7 +103,7 @@ def summarize_alert(alert: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def format_alerts_list(response: Dict[str, Any]) -> Dict[str, Any]:
+def format_alerts_list(response: dict[str, Any]) -> dict[str, Any]:
     """
     Flatten an ``alerts.list`` response into summarized rows plus the page token.
 
@@ -118,7 +118,7 @@ def format_alerts_list(response: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def build_feedback_body(feedback_type: str) -> Dict[str, Any]:
+def build_feedback_body(feedback_type: str) -> dict[str, Any]:
     """
     Validate a feedback type and shape it into an ``alerts.feedback.create`` request body.
 
@@ -200,8 +200,8 @@ def handle_alert_center_errors(tool_name: str):
                 raise
             except HttpError as error:
                 message = summarize_alert_center_error(error, tool_name)
-                logger.error(message, exc_info=True)
-                raise Exception(message) from error
+                logger.exception(message)
+                raise RuntimeError(message) from error
 
         return wrapper
 

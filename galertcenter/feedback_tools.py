@@ -13,7 +13,7 @@ consented; see summarize_alert_center_error for the exact guidance surfaced on 4
 """
 
 import logging
-from typing import Any, Dict
+from typing import Any
 
 from mcp import Resource
 
@@ -39,7 +39,7 @@ async def create_alert_feedback(
     user_google_email: str,
     alert_id: str,
     feedback_type: str,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Rate how useful an alert was (non-destructive; does NOT triage or close the alert).
 

@@ -14,7 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from auth.scopes import (  # noqa: E402
+from auth.scopes import (
     ALERT_CENTER_READONLY_SCOPE,
     ALERT_CENTER_SCOPE,
     SCOPE_HIERARCHY,
@@ -23,8 +23,8 @@ from auth.scopes import (  # noqa: E402
     get_scopes_for_tools,
     has_required_scopes,
 )
-from auth.service_decorator import SCOPE_GROUPS, SERVICE_CONFIGS  # noqa: E402
-from galertcenter import alert_tools, feedback_tools  # noqa: E402
+from auth.service_decorator import SCOPE_GROUPS, SERVICE_CONFIGS
+from galertcenter import alert_tools, feedback_tools
 
 
 def test_read_tools_use_read_scope_group():
